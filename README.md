@@ -15,7 +15,7 @@ sh setup.sh
 
 Unfortunately, git doesn't allow you to create empty directories so that script just creates a few
 for your convenience. Then, set up the DNS records. Mine look like this, although yours will
-obviously have a differnt URL and IP address.
+obviously have a different URL and IP address.
 
 ```
 natechoe.dev	A	3600	45.33.6.152
@@ -25,7 +25,9 @@ natechoe.dev	MX	3600	0 mail.natechoe.dev
 mail.natechoe.dev	CNAME	3600	natechoe.dev
 ```
 
-Then, set up a reverse-DNS lookup for your IP address to your domain.
+Then, set up a reverse-DNS lookup for your IP address to your domain. This can only be done through
+your VPS provider or ISP. In Linode, go to the Network tab in your Linode, and click "Edit RDNS" by
+your IP address.
 
 Next, run the following command:
 
