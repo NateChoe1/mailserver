@@ -1,0 +1,51 @@
+# NOTE: If you want to host both a mail server and a web server (like me), make
+# sure the project names (the final subdirectory name) of the mail server and th
+# web server are different. For example, if your web server is hosted at
+# /root/natechoe.dev, your email server should not be hosted at
+# /root/mail/natechoe.dev because the final subdirectory for both of these paths
+# is natechoe.dev. This made my email server bind to my web server and caused
+# lots of headaches.
+
+version: "3.8"
+
+services:
+  mailserver:
+    image: docker.io/mailserver/docker-mailserver:latest
+    container_name: natechoe.dev-mailserver
+    hostname: natechoe.dev-mail
+    domainname: natechoe.dev
+    ports:
+      - "25:25"
+      - "465:465"
+      - "587:587"
+        # SMTP
+
+      - "143:143"
+      - "993:993"
+      # IMAP
+    volumes:
+      - ./docker-data/dms/mail-data/:/var/mail/
+      - ./docker-data/dms/mail-state/:/var/mail-state/
+      - ./docker-data/dms/mail-logs/:/var/log/mail/
+      - ./docker-data/dms/config/:/tmp/docker-mailserver/
+      - /etc/letsencrypt/:/etc/letsencrypt/
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - ONE_DIR=1
+      - ENABLE_AMAVIS=1
+      - ENABLE_CLAMAV=0
+      - ENABLE_POP3=0
+      - ENABLE_FAIL2BAN=1
+      - ENABLE_POSTGREY=1
+      - ENABLE_SASLAUTHD=1
+      - SASLAUTHD_MECHANISMS=rimap
+      - SASLAUTHD_MECH_OPTIONS=127.0.0.1
+
+      - SSL_TYPE=letsencrypt
+      - SPOOF_PROTECTION=1
+      - ENABLE_SPAMASSASSIN=1
+      - POSTFIX_INET_PROTOCOLS=ipv4
+      - DOVECOT_INET_PROTOCOLS=ipv4
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE

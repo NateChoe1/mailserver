@@ -1,0 +1,4 @@
+docker-data/dms/config/*
+docker-data/dms/mail-data/*
+docker-data/dms/mail-logs/*
+docker-data/dms/mail-state/*
