@@ -1,10 +1,10 @@
 CFLAGS := -Wall -Wpedantic -O2
 INSTALLDIR := /usr/bin/
 
-wrapper: wrapper.c
+mailwrapper: wrapper.c
 	$(CC) $< -o $@ $(CFLAGS)
 
-install: wrapper.c
+install: mailwrapper
 	cp $< $(INSTALLDIR)
 
 .PHONY: install
