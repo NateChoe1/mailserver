@@ -46,6 +46,17 @@ docker exec mailserver setup email add [email] [password]
 This command creates a new email address with the email and password specified in the command. If
 you don't get any errors, then congratulations, you're nearly there.
 
+**BEGIN OPTIONAL SECTION**
+
+This step is technically optional, but if you skip it your emails will almost definitely be marked
+as spam.
+
+Run
+
+```
+docker exec mailserver setup config dkim
+```
+
 Check the contents of `docker-data/dms/config/opendkim/keys/[your url]/mail.txt` and add that to
 your DNS record. For example, my file says
 
@@ -61,6 +72,8 @@ so my DNS record says
 ```
 mail._domainkey.natechoe.dev	TXT	3600	"v=DKIM1; h=sha256; k=rsa; p=MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAncKNo62sftY7hPc2hyVc2tebUI38RTy4w5WUa7aKXf/Qr4eeki0/K9yB1wPDg97TTrVIbCOCohWY9/d77mC8KaCxcRvoV1tZRacA3ZHVqseZ+N8KD4ImvIwVNo1zmsZwzce5mcTO9a32aEfPbEmMCd07ozLY1mJaSi2utxIdahxDZIuF+PpHojK5y1NNKe6iesx4eutNH7/FhJO+bPRdcJi2b727C1LGIoIVZIy7eqSFRZZ6p47UCrYn6/YLKEW1JdVl/SC/+HDyO6DeUlC/i/ebzrLqIuY7ZSnK408o3dxySpuZ1KSiIfG0efvLCQkNP/eYw4qLi5Nq7rGKynpTUDAbNP58pjbKv/4BvzMdDEUUOlqMFzrbZXZROU/FsyJIr+YKwaMDUjIeXR/PhH3zue/I+8oNoMEaL8n1UynlLapTvaTnDbOOcMP2qi41rb2vDpmZTgxe+rx93DoipjLb/dpsf0xM0px68BrmThW8X0l15W2pBu3Uytg5cpTkntGOM0psGx9TMX4vrY8aki4/rbSrA+9FNm8GCylWJHyJXB1Y49DWQdIxY/8ewkMdbOqRHjIsjTvG6M4owI6NiGI0RIi5oZMRYomHndvZyzlNtgCCKAVABaIYbi0QHXWzyglbgKZPmXC+Afw/3NeIyFoTTUfjjJKHXq5U7fs1wR7B9MsCAwEAAQ=="
 ```
+
+**END OPTIONAL SECTION**
 
 Finally, run the following command
 
