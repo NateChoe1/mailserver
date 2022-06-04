@@ -1,10 +1,13 @@
 CFLAGS := -Wall -Wpedantic -O2
 INSTALLDIR := /usr/bin/
+OUT := mailwrapper
 
-mailwrapper: wrapper.c
+$(OUT): wrapper.c
 	$(CC) $< -o $@ $(CFLAGS)
 
-install: mailwrapper
-	cp $< $(INSTALLDIR)
+install: $(OUT)
+	cp $< $(INSTALLDIR)/$(OUT)
+	chown root:docker $(INSTALLDIR)/$(OUT)
+	chmod 2555 $(INSTALLDIR)/$(OUT)
 
 .PHONY: install

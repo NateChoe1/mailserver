@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include <pwd.h>
 #include <errno.h>
 #include <unistd.h>
 #include <termios.h>
@@ -12,6 +13,8 @@ static int addemail(int argc, char **argv);
 static int updateemail(int argc, char **argv);
 static int deleteemail(int argc, char **argv);
 static int showemails(int argc, char **argv);
+static int allowed(char *email);
+/* Checks if the current user is allowed to mess with that email*/
 static void getcredentials(int argc, char **argv,
 		char **emailret, char **passret);
 static char *askuser(char *prompt);
@@ -22,6 +25,20 @@ static void *xrealloc(void *ptr, size_t size);
 static int exec(char *pathname, char *arg, ...);
 
 #define INPUT_FLAGS (ECHO)
+
+struct privilege {
+	char *user;
+	char *domain;
+};
+
+const static struct privilege privileges[] = {
+	{"nate",    "natechoe.dev"},
+	{"kenneth", "29r-03.com"},
+	{"kenneth", "agilesalt.net"},
+	{"kenneth", "koreanalive.com"},
+	{"kenneth", "realisticdata.com"},
+};
+/* Feel free to change this list, I don't to do any config file parsing. */
 
 int main(int argc, char **argv) {
 	if (argc < 2) {
@@ -51,6 +68,10 @@ int main(int argc, char **argv) {
 static int addemail(int argc, char **argv) {
 	char *email, *password;
 	getcredentials(argc, argv, &email, &password);
+	if (!allowed(email)) {
+		fputs("You don't have control over that domain\n", stderr);
+		return 1;
+	}
 	return exec("/usr/bin/docker", "docker", "exec", "mailserver",
 			"setup", "email", "add", email, password, NULL);
 }
@@ -58,6 +79,10 @@ static int addemail(int argc, char **argv) {
 static int updateemail(int argc, char **argv) {
 	char *email, *password;
 	getcredentials(argc, argv, &email, &password);
+	if (!allowed(email)) {
+		fputs("You don't have control over that domain\n", stderr);
+		return 1;
+	}
 	return exec("/usr/bin/docker", "docker", "exec", "mailserver",
 			"setup", "email", "update", email, password, NULL);
 }
@@ -68,6 +93,10 @@ static int deleteemail(int argc, char **argv) {
 		email = askuser("Email to delete: ");
 	else
 		email = argv[1];
+	if (!allowed(email)) {
+		fputs("You don't have control over that domain\n", stderr);
+		return 1;
+	}
 	return exec("/usr/bin/docker", "docker", "exec", "mailserver",
 			"setup", "email", "del", email, NULL);
 }
@@ -75,6 +104,30 @@ static int deleteemail(int argc, char **argv) {
 static int showemails(int argc, char **argv) {
 	return exec("/usr/bin/docker", "docker", "exec", "mailserver",
 			"setup", "email", "list");
+}
+
+static int allowed(char *email) {
+	int i;
+	char *username, *domain;
+	uid_t uid;
+	uid = getuid();
+	username = getpwuid(uid)->pw_name;
+
+	if (uid == 0)
+		return 1;
+
+	domain = email;
+	while (domain[0] != '@' && domain[0] != '\0')
+		++domain;
+	if (domain[0] == '\0')
+		return 0;
+	++domain;
+	for (i = 0; i < sizeof privileges / sizeof *privileges; ++i) {
+		if (strcmp(domain, privileges[i].domain) == 0)
+			if (strcmp(username, privileges[i].user) == 0)
+				return 1;
+	}
+	return 0;
 }
 
 static void getcredentials(int argc, char **argv,
