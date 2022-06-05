@@ -2,4 +2,8 @@ docker-data/dms/config/*
 docker-data/dms/mail-data/*
 docker-data/dms/mail-logs/*
 docker-data/dms/mail-state/*
+!docker-data/dms/config/.gitkeep
+!docker-data/dms/mail-data/.gitkeep
+!docker-data/dms/mail-logs/.gitkeep
+!docker-data/dms/mail-state/.gitkeep
 mailwrapper
